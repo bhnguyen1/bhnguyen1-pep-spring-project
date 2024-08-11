@@ -24,10 +24,10 @@ import java.util.List;
     retrieve all messages from a user_id (select)
 */
 
-public interface MessageRepository {
+public interface MessageRepository extends JpaRepository<Message, Integer>{
     //to see all messages from a specific user with their id
-    List<Message> findMessagesByPostedBy(Long postedBy); 
+    @Query("Select m from Message m where m.postedBy = :postedBy")
+    List<Message> getMessagesFromUser(@Param("postedBy") Integer postedBy);
 
-    // @Query("Select m from Message m where m.postedBy = :postedBy")
-    // List<Message> getMessagesFromUser(@Param("postedBy") Long postedBy);
+    // List<Message> findMessagesByPostedBy(Integer postedBy); 
 }

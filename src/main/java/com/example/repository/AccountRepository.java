@@ -23,15 +23,15 @@ import org.springframework.data.repository.query.Param;
     login into account with password (select) 
 */
 
-public interface AccountRepository extends JpaRepository<Account, Long> {
+public interface AccountRepository extends JpaRepository<Account, Integer> {
+    //checks to see if account exists by with id -- might need to do custom query (https://www.baeldung.com/spring-data-exists-query)
+    boolean existsAccountByAccountId(int accountId);
+
     //Checks to see if the account exists with username
-    @Query("Select a from Account a where a.username = :username")
-    Account checkAccount(@Param("username") String username);
+    boolean existsAccountByUsername(String username);
 
     //checks to see if account username exists and matches with password
     @Query("Select a from Account a where a.username = :username and a.password = :password")
     Account login(@Param("username") String username, @Param("password") String password);
 
-    // Account findAccountByUsername(String username);
-    // Account findAccountByUsernameAndPassword(String username, String password)
 }
