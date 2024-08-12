@@ -10,6 +10,7 @@ import javax.transaction.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 /*
@@ -56,20 +57,19 @@ public class MessageService {
         this.accountRepository = accountRepository;
     }
 
-    //logic on here might be funky (71-73)
-    public Message updateMessage(int messageId, Message newMessage) {
+    @Transactional
+    public int updateMessage(int messageId, String newMessage) {
         Optional<Message> optionalMessage = messageRepository.findById(messageId);
         if(!optionalMessage.isPresent()) {
-            System.out.println("Could not find message");
-            return null;
+            throw new NoSuchElementException("Message does not exist!");
         }
-        if(newMessage.getMessageText().isEmpty() || newMessage.getMessageText().length() > 255) {
-            System.out.println("Invalid Text");
-            return null;
+        if(newMessage.isEmpty() || newMessage.length() > 255) {
+            throw new IllegalArgumentException("Invalid text!");
         }
         Message message = optionalMessage.get();
-        message.setMessageText(newMessage.getMessageText());
-        return messageRepository.save(message);
+        message.setMessageText(newMessage);
+        messageRepository.save(message);
+        return 1;
     }
 
     //check to see if arrayList will end up being wrong 
@@ -91,7 +91,7 @@ public class MessageService {
         if(optionalMessage.isPresent()) {
             return optionalMessage.get();
         } else {
-            return null;
+            throw new NoSuchElementException("Could not find message");
         }
     } 
 
@@ -100,13 +100,12 @@ public class MessageService {
     }
 
     @Transactional
-    public boolean deleteMessage(Message message) { //might need to hotfix by doing .getById() instead
-        Optional<Message> optionalMessage = messageRepository.findById(message.getMessageId());
+    public boolean deleteMessage(int messageId) { //might need to hotfix by doing .getById() instead
+        Optional<Message> optionalMessage = messageRepository.findById(messageId);
         if(optionalMessage.isPresent()) {
-            messageRepository.deleteById(message.getMessageId());
+            messageRepository.deleteById(messageId);
             return true;
         } else {
-            System.out.println("Could not find message");
             return false;
         }
     }
@@ -114,12 +113,10 @@ public class MessageService {
     @Transactional
     public Message createMessage(Message message) {
         if(!accountRepository.existsAccountByAccountId(message.getPostedBy())) {
-            System.out.println("User does not exist!");
-            return null;
+            throw new NoSuchElementException("Account does not exist!");
         }
         if(message.getMessageText().isEmpty() || message.getMessageText().length() > 255) {
-            System.out.println("Invalid text!");
-            return null;
+            throw new IllegalArgumentException("Invalid text!");
         }
         return messageRepository.save(message);
     }

@@ -35,18 +35,20 @@ public class AccountService {
 
     public Account loginIntoAccount(String username, String password) {
         Account account = accountRepository.login(username, password);
-        return account;
+        if(account != null) {
+            return account;
+        } else {
+            throw new IllegalArgumentException("Username or password is wrong!");
+        }
     }
 
     @Transactional
     public Account addAccount(Account account) {
         if(accountRepository.existsAccountByUsername(account.getUsername())) {
-            System.out.println("Username already exists!");
-            return null;
+            throw new IllegalStateException("Username already exists!");
         }
         if(account.getUsername().isEmpty() || account.getPassword().length() < 4) {
-            System.out.println("Invalid username or password!");
-            return null;
+            throw new IllegalArgumentException("Invalid username or password!");
         }
         return accountRepository.save(account);
     }
