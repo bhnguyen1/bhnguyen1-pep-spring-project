@@ -33,8 +33,7 @@ public class SocialMediaController {
     }
 
     @PatchMapping("/messages/{messageId}")
-    public @ResponseBody ResponseEntity<Integer> patchMessage(@PathVariable int messageId, 
-                                                              @RequestBody Message newMessage) {
+    public @ResponseBody ResponseEntity<Integer> patchMessage(@PathVariable int messageId, @RequestBody Message newMessage) {
         try {
             int result = messageService.updateMessage(messageId, newMessage.getMessageText());
             return ResponseEntity.ok(result);
